@@ -13,10 +13,13 @@ import projects.service.ProjectsService;
 public class Projects {
 	private Scanner scanner = new Scanner(System.in);
 	private ProjectsService projectsService = new ProjectsService();
+	private Project curProject ;
 
 	// @formatter:off
 	private List<String> operations = List.of(
-			"1) Add project to table"
+			"1) Add project to table",
+			"2) List projects",
+			"3) Select a project"
 			);
 	// @formatter:on
 
@@ -39,6 +42,14 @@ public class Projects {
 					createProject();
 					break;
 					
+				case 2:
+					listProjects();
+					break;
+					
+				case 3:
+					selectProject();
+					break;
+					
 					default:
 						System.out.println("\n" + operation + " is not valid. Try again");
 						break;
@@ -47,6 +58,22 @@ public class Projects {
 				System.out.println("\nError: " + e.toString() + " Try again.");
 			}
 		}
+	}
+
+
+	private void selectProject() {
+		listProjects();
+		Integer projectId = getIntInput ("Enter a project ID to select a project");
+		
+		curProject = null;
+		curProject = projectsService.fetchProjectById(projectId);
+	}
+
+	private void listProjects() {
+		List<Project> projects = projectsService.fetchProjects();
+		System.out.println("/nProjects:");
+		projects.forEach(project -> System.out.println
+				(" " + project.getProjectId() + " : " + project.getProjectName()));
 	}
 
 	private void createProject() throws SQLException {
@@ -86,6 +113,12 @@ public class Projects {
 		System.out.println("Here are your choices:");
 
 		operations.forEach(op -> System.out.println("	" + op));
+		
+		if(Objects.isNull(curProject)) {
+			System.out.println("\nYou are not working with a project.");
+		} else {
+			System.out.println("\nYou are working with project: " + curProject);
+		}
 	}
 
 	private BigDecimal getDecimalInput(String prompt) {
